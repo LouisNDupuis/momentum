@@ -6,6 +6,10 @@ use PDO;
 use PDOException;
 use data\Credential;
 
+
+/**
+ * Really Basic Class For DB Handling
+ */
 class Data {
 
 	/**
@@ -14,13 +18,12 @@ class Data {
 	 * @return bool|PDO
 	 */
 	protected function connect() {
-		$dbh = false;
 		try {
-			$dbh = new PDO( 'mysql:host='.Credential::DB_HOST.';dbname='.Credential::DB_NAME, Credential::DB_USER, Credential::DB_PASS );
+			$pdo = new PDO( 'mysql:host='.Credential::DB_HOST.';dbname='.Credential::DB_NAME, Credential::DB_USER, Credential::DB_PASS );
 		} catch ( PDOException $e ) {
-			return false;
+			$pdo = false;
 		}
-		return $dbh;
+		return $pdo;
 	}
 
 	/**
@@ -28,6 +31,24 @@ class Data {
 	 */
 	protected function close( PDO &$connection ) {
 		$connection = null;
+	}
+
+	/**
+	 * Execute a given query
+	 *
+	 * @param String $query : the query to be executed
+	 * @return bool
+	 */
+	public function executeQuery( $query ) {
+		$queryExecuted = false;
+
+		$pdo = $this->connect();
+		if ( $pdo ) {
+			$queryExecuted = $pdo->query( $query );
+			$this->close( $pdo );
+		}
+
+		return $queryExecuted;
 	}
 
 }

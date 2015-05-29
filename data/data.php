@@ -2,6 +2,8 @@
 
 namespace data;
 
+include( "data/Credential.php" );
+
 use PDO;
 use PDOException;
 use data\Credential;
@@ -44,7 +46,7 @@ class Data {
 
 		$pdo = $this->connect();
 		if ( $pdo ) {
-			$queryExecuted = $pdo->query( $query );
+			$queryExecuted = $pdo->query( $query )->fetch( PDO::FETCH_OBJ );
 			$this->close( $pdo );
 		}
 

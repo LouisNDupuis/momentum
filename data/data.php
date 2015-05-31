@@ -41,16 +41,72 @@ class Data {
 	 * @param String $query : the query to be executed
 	 * @return bool
 	 */
-	public function executeQuery( $query ) {
+	public function executeQueryfetch( $query ) {
 		$queryExecuted = false;
 
 		$pdo = $this->connect();
 		if ( $pdo ) {
-			$queryExecuted = $pdo->query( $query )->fetch( PDO::FETCH_OBJ );
+			try {
+				$queryExecuted = $pdo->query( $query )->fetch( PDO::FETCH_OBJ );
+			} catch ( PDOException $e ) {
+				echo $e->getMessage();
+			}
 			$this->close( $pdo );
 		}
 
 		return $queryExecuted;
 	}
+	
+	/**
+	 * Execute a given query for All entries
+	 *
+	 * @param String $query : the query to be executed
+	 * @return bool
+	 */
+	public function executeQueryAll( $query ) {
+		$queryExecuted = false;
+
+		$pdo = $this->connect();
+		if ( $pdo ) {
+			try {
+				$queryExecuted = $pdo->query( $query )->fetchAll( PDO::FETCH_OBJ );
+			} catch ( PDOException $e ) {
+				echo $e->getMessage();
+			}
+			$this->close( $pdo );
+		}
+
+		return $queryExecuted;
+	}
+	
+	/**
+	 * Insert in db
+	 *
+	 * @param $query the query!
+	 * @param
+	 * @return int|bool the last id inserted, result query otherwise
+	 */ 
+	 public function executeQuery( $query, $return_id = true ) {
+		$queryExecuted = false;
+
+		$pdo = $this->connect();
+		if ( $pdo ) {
+			try {
+				$queryToExecute = $pdo->prepare( $query );
+				$queryExec = $queryToExecute->execute();
+				
+				if ( $queryExec && $return_id ) {
+					$queryExecuted = $pdo->lastInsertId();
+				} else if ( $queryExec && !$return_id ) {
+					$queryExecuted = $queryExec;
+				}
+			} catch ( PDOException $e ) {
+				echo $e->getMessage();
+			}
+		}
+		$this->close( $pdo );
+		
+		return $queryExecuted;
+	 }
 
 }
